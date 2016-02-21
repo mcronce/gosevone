@@ -16,23 +16,30 @@ func main() {
 
     // Create a new Device
     device := map[string]string {
-        "name":             "Test Device 1",
+        "name":             "Test Device Y",
         "description":      "Test Description 1",
         "ipAddress":        "127.0.0.1",
         "pollingFrequency": "300",
     }
-    respMap, err := c.Post("devices", device)
+
+    var respMap map[string]interface{}
+
+    // We get generic interface back from these calls
+    resp, err := c.Post("devices", device)
+    err = resp.Decode(&respMap)
     sevrest.PrettyPrint(respMap)
 
     // Get my ID (and numbers in the map are float64)
-    deviceId := sevrest.FloatToString(respMap["id"].(float64), 0)
+    deviceId := sevrest.Float64ToIntString(respMap["id"].(float64))
 
     // Get our device
-    respMap, err = c.Get("devices/"+deviceId)
+    resp, err = c.Get("devices/"+deviceId)
+    err = resp.Decode(&respMap)
     sevrest.PrettyPrint(respMap)
     
     // Get all devices
-    respMap, err = c.Get("devices")
+    resp, err = c.Get("devices")
+    err = resp.Decode(&respMap)
     sevrest.PrettyPrint(respMap)
 
 }

@@ -28,7 +28,11 @@ func main() {
         "objectId"      : "5029",
         "ignoreUntil"   : "0",
     }
-    respMap, err := c.Post("/policies/61/alerts", alert)
+
+    var respMap map[string]interface{}
+
+    resp, err := c.Post("policies/61/alerts", alert)
+    err = resp.Decode(&respMap)
     sevrest.PrettyPrint(respMap)
 
 }

@@ -28,6 +28,8 @@ type ClientStruct struct {
     X_Auth_Token string
 }
 
+type Response http.Response
+
 // Build the initial client 
 func Client(apiURL string) *ClientStruct {
     baseURL, _ := url.Parse(apiURL)
@@ -43,10 +45,7 @@ func (c *ClientStruct) Auth(username string, password string) (error) {
 
     // Username Password JSON
     authMap := map[string]string { "name": username, "password": password }
-    authJSONBytes, err := json.Marshal(authMap)
-    authJSONReader := bytes.NewReader(authJSONBytes)
-
-    resp, err := c.Request("POST", "authentication/signin", authJSONReader)
+    resp, err := c.Post("authentication/signin", authMap)
 
     if(err != nil || resp.StatusCode != 200) {
         return fmt.Errorf("Unable to log into SevOne. Status %i", resp.StatusCode)
@@ -58,7 +57,7 @@ func (c *ClientStruct) Auth(username string, password string) (error) {
     }
 
     var t Token
-    err = json.NewDecoder(resp.Body).Decode(&t)
+    err = resp.Decode(&t)
     c.X_Auth_Token = t.Token
 
     return nil
@@ -95,40 +94,44 @@ func (c *ClientStruct) Request(method string, urlStr string, body io.Reader) (*h
 
 }
 
-func (c *ClientStruct) Get(urlStr string) (map[string]interface{}, error) { 
-    resp, err := c.Request("GET", urlStr, nil)
-    respMap := ResponseToMap(resp)
-    return respMap, err
+func (c *ClientStruct) Get(urlStr string) (*Response, error) { 
+    httpresp, err := c.Request("GET", urlStr, nil)
+    resp := Response(*httpresp)
+    return &resp, err
 }
 
-func (c *ClientStruct) Delete(urlStr string) (map[string]interface{}, error) { 
-    resp, err := c.Request("DELETE", urlStr, nil)
-    respMap := ResponseToMap(resp)
-    return respMap, err
+func (c *ClientStruct) Delete(urlStr string) (*Response, error) { 
+    httpresp, err := c.Request("DELETE", urlStr, nil)
+    resp := Response(*httpresp)
+    return &resp, err
 }
 
-func (c *ClientStruct) Post(urlStr string, JSONMap map[string]string) (map[string]interface{}, error) { 
-    JSONReader, err := NewJSONReader(JSONMap)
+func (c *ClientStruct) Post(urlStr string, data interface{}) (*Response, error) { 
+    JSONReader, err := NewJSONReader(data)
     if(err != nil) {
         return nil, nil
     }
-    resp, err := c.Request("POST", urlStr, JSONReader)
-    respMap := ResponseToMap(resp)
-    return respMap, err
+    httpresp, err := c.Request("POST", urlStr, JSONReader)
+    resp := Response(*httpresp)
+    return &resp, err
 }
 
-func (c *ClientStruct) Put(urlStr string, JSONMap map[string]string) (map[string]interface{}, error) { 
-    JSONReader, err := NewJSONReader(JSONMap)
+func (c *ClientStruct) Put(urlStr string, data interface{}) (*Response, error) { 
+    JSONReader, err := NewJSONReader(data)
     if(err != nil) {
         return nil, nil
     }
-    resp, err := c.Request("PUT", urlStr, JSONReader)
-    respMap := ResponseToMap(resp)
-    return respMap, err
+    httpresp, err := c.Request("PUT", urlStr, JSONReader)
+    resp := Response(*httpresp)
+    return &resp, err
 }
 
-func NewJSONReader(JSONMap map[string]string) (io.Reader, error) {
-    JSONBytes, err := json.Marshal(JSONMap)
+func (resp *Response) Decode(target interface{}) (error) {
+    return json.NewDecoder(resp.Body).Decode(target)
+}
+
+func NewJSONReader(source interface{}) (io.Reader, error) {
+    JSONBytes, err := json.Marshal(source)
     if(err != nil) {
         return nil, nil
     }
@@ -136,18 +139,7 @@ func NewJSONReader(JSONMap map[string]string) (io.Reader, error) {
     return JSONReader, nil
 }
 
-// This turns the json response into a map of strings
-func ResponseToMap(resp *http.Response) map[string]interface{} {
-    var jsonInterface interface{}
-    err := json.NewDecoder(resp.Body).Decode(&jsonInterface)
-    if(err != nil) {
-        return map[string]interface{}{}
-    }
-    mapRet := jsonInterface.(map[string]interface{})
-    return mapRet
-}
-
-func PrettyPrint(x map[string]interface{}) {
+func PrettyPrint(x interface{}) {
     b, err := json.MarshalIndent(x, "", "  ")
     if err != nil {
         fmt.Println("error:", err)
@@ -155,6 +147,6 @@ func PrettyPrint(x map[string]interface{}) {
     fmt.Print(string(b))
 }
 
-func FloatToString(input_num float64, precision int) string {
-    return strconv.FormatFloat(input_num, 'f', precision, 64)
+func Float64ToIntString(input float64) string {
+    return strconv.FormatFloat(input, 'f', 0, 64)
 }
