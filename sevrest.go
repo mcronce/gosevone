@@ -7,7 +7,6 @@ import (
     "net/url"
     "bytes"
     "io"
-    "strconv"
 )
 
 const (
@@ -17,6 +16,7 @@ const (
     headerContentType   = "application/json;charset=UTF-8"
 )
 
+// Our client 
 type ClientStruct struct {
     // HTTP client
     client *http.Client
@@ -28,19 +28,28 @@ type ClientStruct struct {
     X_Auth_Token string
 }
 
+// This type will allow us to create type functions for this library
 type Response http.Response
 
 // Build the initial client 
 func Client(apiURL string) *ClientStruct {
+
+    // Ensure the URL ends with a slash
+    if(apiURL[len(apiURL)-1] != '/') {
+        apiURL += "/"
+    }
+
+    // Setup the client
     baseURL, _ := url.Parse(apiURL)
-    c := &ClientStruct{
+    client := &ClientStruct{
         client: http.DefaultClient,
         BaseURL: baseURL,
         X_Auth_Token: "",
     }
-    return c
+    return client
 }
 
+// Authenticate to the API and store the token for sending in the header
 func (c *ClientStruct) Auth(username string, password string) (error) {
 
     // Username Password JSON
@@ -56,6 +65,7 @@ func (c *ClientStruct) Auth(username string, password string) (error) {
         Token string `json: token`
     }
 
+    // Decode and store the auth token to use for future requests
     var t Token
     err = resp.Decode(&t)
     c.X_Auth_Token = t.Token
@@ -66,8 +76,13 @@ func (c *ClientStruct) Auth(username string, password string) (error) {
 // NewRequest creates an API request. A relative URL can be provided in urlStr, which will be resolved to the
 // BaseURL of the Client. Relative URLS should always be specified without a preceding slash.
 func (c *ClientStruct) Request(method string, urlStr string, body io.Reader) (*http.Response, error) {
+
+    // Ensure the Url doesn't start with a slash
+    if(urlStr[0] == '/') {
+        urlStr = urlStr[1:]
+    }
     
-    // Sign into the API
+    // Parse the Url
     rel, err := url.Parse(urlStr)
     if err != nil {
         return nil, err
@@ -76,6 +91,7 @@ func (c *ClientStruct) Request(method string, urlStr string, body io.Reader) (*h
     // Build the URL
     apiUrl := c.BaseURL.ResolveReference(rel)
 
+    // Make the request
     req, err := http.NewRequest(method, apiUrl.String(), body)   
     if err != nil {
         return nil, err
@@ -85,6 +101,7 @@ func (c *ClientStruct) Request(method string, urlStr string, body io.Reader) (*h
     req.Header.Add("Accept", headerAccept)
     req.Header.Add("Content-Type", headerContentType)
     req.Header.Add("User-Agent", headerUserAgent)
+    // SevOne Auth Token
     if(c.X_Auth_Token != "") {
         req.Header.Add("X-Auth-Token", c.X_Auth_Token)
     }
@@ -94,42 +111,48 @@ func (c *ClientStruct) Request(method string, urlStr string, body io.Reader) (*h
 
 }
 
+// GET Request
 func (c *ClientStruct) Get(urlStr string) (*Response, error) { 
     httpresp, err := c.Request("GET", urlStr, nil)
     resp := Response(*httpresp)
     return &resp, err
 }
 
+// DELETE Request
 func (c *ClientStruct) Delete(urlStr string) (*Response, error) { 
     httpresp, err := c.Request("DELETE", urlStr, nil)
     resp := Response(*httpresp)
     return &resp, err
 }
 
+// POST Request
 func (c *ClientStruct) Post(urlStr string, data interface{}) (*Response, error) { 
     JSONReader, err := NewJSONReader(data)
     if(err != nil) {
-        return nil, nil
+        return nil, err
     }
     httpresp, err := c.Request("POST", urlStr, JSONReader)
     resp := Response(*httpresp)
     return &resp, err
 }
 
+// PUT Request
 func (c *ClientStruct) Put(urlStr string, data interface{}) (*Response, error) { 
     JSONReader, err := NewJSONReader(data)
     if(err != nil) {
-        return nil, nil
+        return nil, err
     }
     httpresp, err := c.Request("PUT", urlStr, JSONReader)
     resp := Response(*httpresp)
     return &resp, err
 }
 
+// This will decode the return JSON into whatever you provide as a container
 func (resp *Response) Decode(target interface{}) (error) {
     return json.NewDecoder(resp.Body).Decode(target)
 }
 
+// This reads from your source container and provides a Reader for the request
 func NewJSONReader(source interface{}) (io.Reader, error) {
     JSONBytes, err := json.Marshal(source)
     if(err != nil) {
@@ -139,14 +162,12 @@ func NewJSONReader(source interface{}) (io.Reader, error) {
     return JSONReader, nil
 }
 
+// Turns most objects into JSON and prints them pretty
 func PrettyPrint(x interface{}) {
     b, err := json.MarshalIndent(x, "", "  ")
     if err != nil {
         fmt.Println("error:", err)
     }
-    fmt.Print(string(b))
+    fmt.Println(string(b))
 }
 
-func Float64ToIntString(input float64) string {
-    return strconv.FormatFloat(input, 'f', 0, 64)
-}
