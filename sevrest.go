@@ -55,9 +55,11 @@ func (c *ClientStruct) Auth(username string, password string) (error) {
     // Username Password JSON
     authMap := map[string]string { "name": username, "password": password }
     resp, err := c.Post("authentication/signin", authMap)
-
-    if(err != nil || resp.StatusCode != 200) {
-        return fmt.Errorf("Unable to log into SevOne. Status %i", resp.StatusCode)
+    if(err != nil) {
+        return err
+    }
+    if(resp.StatusCode != 200) {
+        return fmt.Errorf("Unable to log into SevOne. Status: %i", resp.StatusCode)
     }
 
     // We get back a json with just the token
@@ -114,15 +116,27 @@ func (c *ClientStruct) Request(method string, urlStr string, body io.Reader) (*h
 // GET Request
 func (c *ClientStruct) Get(urlStr string) (*Response, error) { 
     httpresp, err := c.Request("GET", urlStr, nil)
+    if(err != nil) {
+        return nil, err
+    }
     resp := Response(*httpresp)
-    return &resp, err
+    if(err != nil) {
+        return nil, err
+    }
+    return &resp, nil
 }
 
 // DELETE Request
 func (c *ClientStruct) Delete(urlStr string) (*Response, error) { 
     httpresp, err := c.Request("DELETE", urlStr, nil)
+    if(err != nil) {
+        return nil, err
+    }
     resp := Response(*httpresp)
-    return &resp, err
+    if(err != nil) {
+        return nil, err
+    }
+    return &resp, nil
 }
 
 // POST Request
@@ -132,8 +146,11 @@ func (c *ClientStruct) Post(urlStr string, data interface{}) (*Response, error) 
         return nil, err
     }
     httpresp, err := c.Request("POST", urlStr, JSONReader)
+    if(err != nil) {
+        return nil, err
+    }
     resp := Response(*httpresp)
-    return &resp, err
+    return &resp, nil
 }
 
 // PUT Request
@@ -143,8 +160,11 @@ func (c *ClientStruct) Put(urlStr string, data interface{}) (*Response, error) {
         return nil, err
     }
     httpresp, err := c.Request("PUT", urlStr, JSONReader)
+    if(err != nil) {
+        return nil, err
+    }
     resp := Response(*httpresp)
-    return &resp, err
+    return &resp, nil
 }
 
 // This will decode the return JSON into whatever you provide as a container
