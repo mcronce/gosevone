@@ -41,25 +41,25 @@ func main() {
     var help, listCommands, jsonStdin bool
     var method, jsonFile string
 
-    flag.BoolVar(&help, "-help", false, helpHelp)
+    flag.BoolVar(&help, "help", false, helpHelp)
     flag.BoolVar(&help, "h", false, helpHelp + " (shorthand)")
 
-    flag.StringVar(&apiUrl, "-api", defaultURL, helpURL)
+    flag.StringVar(&apiUrl, "api", defaultURL, helpURL)
     flag.StringVar(&apiUrl, "a", defaultURL, helpURL + " (shorthand)")
-    flag.StringVar(&username, "-username", defaultUsername, helpUsername)
+    flag.StringVar(&username, "username", defaultUsername, helpUsername)
     flag.StringVar(&username, "u", defaultUsername, helpUsername + " (shorthand)")
-    flag.StringVar(&password, "-password", defaultPassword, helpPassword)
+    flag.StringVar(&password, "password", defaultPassword, helpPassword)
     flag.StringVar(&password, "p", defaultPassword, helpPassword + " (shorthand)")
 
-    flag.BoolVar(&listCommands, "-list", false, helpList)
+    flag.BoolVar(&listCommands, "list", false, helpList)
     flag.BoolVar(&listCommands, "l", false, helpList + " (shorthand)")
 
-    flag.StringVar(&method, "-method", defaultMethod, helpMethod)
+    flag.StringVar(&method, "method", defaultMethod, helpMethod)
     flag.StringVar(&method, "m", defaultMethod, helpMethod + " (shorthand)")
 
-    flag.StringVar(&jsonFile, "-json", "", helpJSON)
+    flag.StringVar(&jsonFile, "json", "", helpJSON)
     flag.StringVar(&jsonFile, "j", "", helpJSON + " (shorthand)")
-    flag.BoolVar(&jsonStdin, "-json-stdin", false, helpJSONstdin)
+    flag.BoolVar(&jsonStdin, "json-stdin", false, helpJSONstdin)
     flag.BoolVar(&jsonStdin, "s", false, helpJSONstdin + " (shorthand)")
 
     // Override build in help
@@ -82,6 +82,11 @@ func main() {
         fmt.Println("Examples:")
         fmt.Println("  FLAGS: /devices/1/2/3?test=1 URL: /devices/1/2/3?test=1")
         fmt.Println("  FLAGS: devices 1 2 3 test=1 4 5 test=2 6 URL: /devices/1/2/3/4/5/6?test=1&test=2")
+        fmt.Println("Help:")
+        fmt.Println("  Run with help option with a url of endpoints to list all possible endpoints")
+        fmt.Println("    -h endpoints")
+        fmt.Println("  Run with help and a specific endpoint to get detailed help on that endpoint")
+        fmt.Println("    -method post -help /authentication/signin")
         os.Exit(0);
     }
 
@@ -117,7 +122,7 @@ func main() {
     }
 
     // DEBUG
-    //fmt.Printf("URL: %s\n", fullUrl)
+    //fmt.Printf("URL:%s OPTIONS:%s FULLURL:%s\n", url, options, fullUrl)
 
     // Create Client and Login    
     var c = sevrest.Client(apiUrl)
@@ -129,16 +134,16 @@ func main() {
 
     // API HELP
     if(help) {
-        //var apiDocs map[string]map[string]map[string]interface{}
         var apiDocs sevrest.SevRestApiDocs
 
-        // Get all de
+        // Get the helpdocs from the api
         resp, err := c.Get("api-docs")
         if(err != nil) {
             fmt.Printf("ERROR: %s", err.Error())
         }
         err = resp.Decode(&apiDocs)
-
+        
+        // Use this to debug help structure
         // sevrest.PrettyPrint(apiDocs)
         // os.Exit(0)
         
@@ -150,11 +155,11 @@ func main() {
         sort.Strings(endpoints)
         
         // Check to see if they specified a valid endpoint
-        _, apiCallPresent := apiDocs.Paths[apiPath+url]
+        _, apiCallPresent := apiDocs.Paths[apiPath+url][method]
 
-        if(url == "help" || !apiCallPresent) {
-            if(url != "help") {
-                fmt.Printf("Could not find call: %s searching endpoints.\n", url)
+        if(url == "endpoints" || !apiCallPresent) {
+            if(url != "endpoints") {
+                fmt.Printf("Could not find call: (%s):%s searching endpoints.\n", method, url)
             }
             for _, endpoint := range endpoints {
 
@@ -166,7 +171,7 @@ func main() {
 
                 // If url isn't help we tried to find something that wasn't there
                 // We will search wildcard for that call
-                if strings.Index(endpoint, url) == -1 {
+                if strings.Index(endpoint, url) == -1 && url != "endpoints" {
                     continue;
                 }
                 // Print high level help for this call
@@ -180,6 +185,7 @@ func main() {
             urlHelp := apiDocs.Paths[apiPath+url][method]
             fmt.Printf("URL: %s\n", url)
             fmt.Printf("METHOD: %s\n", method)
+            fmt.Printf("DESCRIPTION: %s\n", urlHelp.Description)
             fmt.Printf("PARAMETERS:\n")
             for _, parameter := range urlHelp.Parameters {
                 if len(parameter.Schema) != 0 {
