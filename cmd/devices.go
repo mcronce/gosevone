@@ -51,7 +51,7 @@ func main() {
     sevrest.PrettyPrint(respMap)
     
     // Get all devices
-    resp, err = c.Get("devices")
+    resp, err = c.Get("/devices")
     if(err != nil) {
         fmt.Printf("ERROR: %s", err.Error())
     }

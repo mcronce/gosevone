@@ -32,6 +32,7 @@ type SevRestDefinitionProperties struct {
     Type string `json: type`
     Enum []string `json: enum`
     Ref string `json: $ref`
+    Items map[string]string `json: items`
 }
 
 type SevRestDefinition struct {
@@ -48,15 +49,20 @@ func (apiDocs SevRestApiDocs) PrintSchemaDefinition(ref string, prepend string) 
     const definitionsRef = "#/definitions/"
     ref = ref[len(definitionsRef):]
 
-    fmt.Printf("%s%s [\n", prepend, ref)
+    fmt.Printf("%s%s :\n", prepend, ref)
     for k, v := range apiDocs.Definitions[ref].Properties {
         if v.Ref != "" {
             apiDocs.PrintSchemaDefinition(v.Ref, prepend+"    ")
+        } else if v.Type == "array" {
+            //PrettyPrint(v)
+            fmt.Printf("  %s%s: [\n", prepend, k)
+            apiDocs.PrintSchemaDefinition(v.Items["$ref"], prepend+"    ")
+            fmt.Printf("  %s]\n", prepend)
         } else {
             fmt.Printf("  %s%s:  %s\n", prepend, k, v.Type)
         }
     }    
-    fmt.Printf("%s]\n", prepend)
+    //fmt.Printf("%s]\n", prepend)
 }
 
 func (apiDocs SevRestApiDocs) PrintSchema(schema map[string]string, prepend string) {

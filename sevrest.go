@@ -93,6 +93,11 @@ func (c *ClientStruct) Request(method string, urlStr string, body io.Reader) (*h
     // Build the URL
     apiUrl := c.BaseURL.ResolveReference(rel)
 
+    // Dump what we're about to send
+    // b1 := make([]byte, 10000)
+    // n1, err := body.Read(b1)
+    // fmt.Printf("%d bytes: %s\n", n1, string(b1))
+
     // Make the request
     req, err := http.NewRequest(method, apiUrl.String(), body)   
     if err != nil {
@@ -141,9 +146,19 @@ func (c *ClientStruct) Delete(urlStr string) (*Response, error) {
 
 // POST Request
 func (c *ClientStruct) Post(urlStr string, data interface{}) (*Response, error) { 
-    JSONReader, err := NewJSONReader(data)
-    if(err != nil) {
-        return nil, err
+
+    // If it's a reader, we'll assume we're already passing good JSON
+    // Otherwise we'll hand off to a function to return JSON from about anything
+    var JSONReader io.Reader
+    var err error
+    switch data := data.(type) {
+    case io.Reader:
+        JSONReader = data
+    default:
+        JSONReader, err = NewJSONReader(data)
+        if(err != nil) {
+            return nil, err
+        }
     }
     httpresp, err := c.Request("POST", urlStr, JSONReader)
     if(err != nil) {
@@ -155,9 +170,19 @@ func (c *ClientStruct) Post(urlStr string, data interface{}) (*Response, error) 
 
 // PUT Request
 func (c *ClientStruct) Put(urlStr string, data interface{}) (*Response, error) { 
-    JSONReader, err := NewJSONReader(data)
-    if(err != nil) {
-        return nil, err
+
+    // If it's a reader, we'll assume we're already passing good JSON
+    // Otherwise we'll hand off to a function to return JSON from about anything
+    var JSONReader io.Reader
+    var err error
+    switch data := data.(type) {
+    case io.Reader:
+        JSONReader = data
+    default:
+        JSONReader, err = NewJSONReader(data)
+        if(err != nil) {
+            return nil, err
+        }
     }
     httpresp, err := c.Request("PUT", urlStr, JSONReader)
     if(err != nil) {
