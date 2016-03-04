@@ -93,11 +93,6 @@ func (c *ClientStruct) Request(method string, urlStr string, body io.Reader) (*h
     // Build the URL
     apiUrl := c.BaseURL.ResolveReference(rel)
 
-    // Dump what we're about to send
-    // b1 := make([]byte, 10000)
-    // n1, err := body.Read(b1)
-    // fmt.Printf("%d bytes: %s\n", n1, string(b1))
-
     // Make the request
     req, err := http.NewRequest(method, apiUrl.String(), body)   
     if err != nil {
@@ -129,6 +124,16 @@ func (c *ClientStruct) Get(urlStr string) (*Response, error) {
         return nil, err
     }
     return &resp, nil
+}
+
+// Get the auth token
+func (c *ClientStruct) GetToken() (string) {
+    return c.X_Auth_Token
+}
+
+// Set the auth token 
+func (c *ClientStruct) SetToken(token string) {
+    c.X_Auth_Token = token
 }
 
 // DELETE Request

@@ -13,7 +13,7 @@ import (
 
 const (
     // Defaults
-    defaultURL = "http://zbrown56c.sevone.com:8080/api/v1/"
+    defaultURL = "http://localhost:8080/api/v1"
     defaultUsername = "admin"
     defaultPassword = ***REMOVED***
 
@@ -25,6 +25,8 @@ const (
     helpURL = "The server API URL"
     helpUsername = "The server Username"
     helpPassword = "The server Password"
+    helpToken = "A valid auth token for this server"
+    helpGetToken = "Will authenticate and return you a valid token"
     
     helpList = "List all possible commands from the API"
     helpMethod = "The HTTP method to use (get, post, put, delete)"
@@ -37,10 +39,12 @@ const (
 
 func main() {
 
-    var apiUrl, username, password string
-    var help, listCommands, jsonStdin bool
+    var apiUrl, username, password, token string
+    var help, jsonStdin bool
     var method, jsonFile string
+    var err error
 
+    // Flags
     flag.BoolVar(&help, "help", false, helpHelp)
     flag.BoolVar(&help, "h", false, helpHelp + " (shorthand)")
 
@@ -50,19 +54,18 @@ func main() {
     flag.StringVar(&username, "u", defaultUsername, helpUsername + " (shorthand)")
     flag.StringVar(&password, "password", defaultPassword, helpPassword)
     flag.StringVar(&password, "p", defaultPassword, helpPassword + " (shorthand)")
-
-    flag.BoolVar(&listCommands, "list", false, helpList)
-    flag.BoolVar(&listCommands, "l", false, helpList + " (shorthand)")
+    flag.StringVar(&token, "token", "", helpToken)
+    flag.StringVar(&token, "t", "", helpToken + " (shorthand)")
 
     flag.StringVar(&method, "method", defaultMethod, helpMethod)
     flag.StringVar(&method, "m", defaultMethod, helpMethod + " (shorthand)")
 
-    flag.StringVar(&jsonFile, "json", "", helpJSON)
+    flag.StringVar(&jsonFile, "-json", "", helpJSON)
     flag.StringVar(&jsonFile, "j", "", helpJSON + " (shorthand)")
     flag.BoolVar(&jsonStdin, "json-stdin", false, helpJSONstdin)
     flag.BoolVar(&jsonStdin, "s", false, helpJSONstdin + " (shorthand)")
 
-    // Override build in help
+    // Override built in help
     flag.Usage = func() {
         fmt.Fprintf(os.Stderr, "%s [options] [commands]: \n", "sevrestcli")
         flag.PrintDefaults()
@@ -71,7 +74,6 @@ func main() {
     // Parse the args
     flag.Parse()
     var args = flag.Args()
-    // fmt.Printf("ARGS: %v %d\n", flag.Args(), len(flag.Args()))
 
     // Help Messsages
     if(len(args) == 0) {
@@ -87,7 +89,29 @@ func main() {
         fmt.Println("    -h endpoints")
         fmt.Println("  Run with help and a specific endpoint to get detailed help on that endpoint")
         fmt.Println("    -method post -help /authentication/signin")
+        fmt.Println("Authentication Token:")
+        fmt.Println("  Run endpoint 'token' and it will return an authentication token you can use for subsequent calls")
+        fmt.Println("Environment Variables: (command line flags take precedence over env variables)")
+        fmt.Println("  SEVONE_API - Set to the API endpoint")
+        fmt.Println("  SEVONE_USERNAME - The username to use to connect")
+        fmt.Println("  SEVONE_PASSWORD - The password to use to connect")
+        fmt.Println("  SEVONE_TOKEN - An authentication token received from the 'token' endpoint")
+        fmt.Println("    If you provide a valid token, you don't need a username and password")
         os.Exit(0);
+    }
+
+    // Allow setting values using environment variables
+    if(apiUrl == defaultURL && os.Getenv("SEVONE_API") != "") {
+        apiUrl = os.Getenv("SEVONE_API")
+    }
+    if(username == defaultUsername && os.Getenv("SEVONE_USERNAME") != "") {
+        username = os.Getenv("SEVONE_USERNAME")
+    }
+    if(password == defaultURL && os.Getenv("SEVONE_PASSWORD") != "") {
+        password = os.Getenv("SEVONE_PASSWORD")
+    }
+    if(token == "" && os.Getenv("SEVONE_TOKEN") != "") {
+        token = os.Getenv("SEVONE_TOKEN")
     }
 
     // Build the URL and options string
@@ -121,15 +145,23 @@ func main() {
         fullUrl += "?"+options
     }
 
-    // DEBUG
-    //fmt.Printf("URL:%s OPTIONS:%s FULLURL:%s\n", url, options, fullUrl)
-
-    // Create Client and Login    
+    // Create Client
     var c = sevrest.Client(apiUrl)
-    var err = c.Auth(username, password)
-    if(err != nil) {
-        fmt.Printf("Error authenticating to SevOne. Error: %s\n", err.Error())
-        os.Exit(1)
+    // If we specified the token
+    if(token != "") {
+        c.SetToken(token)
+    // We need to login    
+    } else {
+        var err = c.Auth(username, password)
+        if(err != nil) {
+            fmt.Printf("Error authenticating to SevOne. Error: %s\n", err.Error())
+            os.Exit(1)
+        }
+        // Spit out the token assuming we authed okay
+        if(url == "token") {
+            fmt.Println(c.GetToken())
+            os.Exit(0)
+        }
     }
 
     // API HELP
@@ -145,7 +177,6 @@ func main() {
         
         // Use this to debug help structure
         // sevrest.PrettyPrint(apiDocs)
-        // os.Exit(0)
         
         // Sort the endpoints for pretty printing
         var endpoints []string
@@ -181,7 +212,7 @@ func main() {
                 }
             }
         } else {
-
+            // We specified a specific URL, let's search for it and print it's info
             urlHelp := apiDocs.Paths[apiPath+url][method]
             fmt.Printf("URL: %s\n", url)
             fmt.Printf("METHOD: %s\n", method)
@@ -230,11 +261,6 @@ func main() {
             os.Exit(1)
         }
     }
-
-    // Dump what we're about to post
-    // b1 := make([]byte, 10000)
-    // n1, err := reader.Read(b1)
-    // fmt.Printf("%d bytes: %s\n", n1, string(b1))
 
     var resp *sevrest.Response
     var respJSON interface{}
