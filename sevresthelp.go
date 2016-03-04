@@ -4,7 +4,6 @@ import (
     "fmt"
 )
 
-
 type SevRestResponse struct {
     Description string `json: description`
     Schema map[string]string `json: schema`
@@ -47,6 +46,8 @@ type SevRestApiDocs struct {
 
 func (apiDocs SevRestApiDocs) PrintSchemaDefinition(ref string, prepend string) {
     const definitionsRef = "#/definitions/"
+
+    if(ref == "") { return }
     ref = ref[len(definitionsRef):]
 
     fmt.Printf("%s%s :\n", prepend, ref)
@@ -59,7 +60,7 @@ func (apiDocs SevRestApiDocs) PrintSchemaDefinition(ref string, prepend string) 
             apiDocs.PrintSchemaDefinition(v.Items["$ref"], prepend+"    ")
             fmt.Printf("  %s]\n", prepend)
         } else {
-            fmt.Printf("  %s%s:  %s\n", prepend, k, v.Type)
+            fmt.Printf("  %s%s: %s\n", prepend, k, v.Type)
         }
     }    
     //fmt.Printf("%s]\n", prepend)

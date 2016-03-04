@@ -59,7 +59,7 @@ func (c *ClientStruct) Auth(username string, password string) (error) {
         return err
     }
     if(resp.StatusCode != 200) {
-        return fmt.Errorf("Unable to log into SevOne. Status: %i", resp.StatusCode)
+        return fmt.Errorf("Unable to log into SevOne. Status: %d", resp.StatusCode)
     }
 
     // We get back a json with just the token
