@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mcronce/gorest"
+	"github.com/sevone/gorest"
 )
 
 const (
