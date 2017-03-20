@@ -17,7 +17,7 @@ type TimeSeriesValue struct {
 func main() {
 	// Create Client and Login
 	var c = sevrest.Client("http://localhost:8080/api/v1")
-	var err = c.Auth("admin", ***REMOVED***)
+	var err = c.Auth("admin", "yourpassword")
 	if err != nil {
 		fmt.Printf(err.Error())
 	}
