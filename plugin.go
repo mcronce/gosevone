@@ -3,7 +3,7 @@ package sevrest
 import (
 	"fmt"
 
-	"github.com/sevone/gorest"
+	"github.com/mcronce/gorest"
 )
 
 type PluginObjectType struct {
