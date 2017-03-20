@@ -2,7 +2,7 @@ package main
     
 import (
     "fmt"
-    "sevrest"
+    "github.com/mcronce/sevrest"
 )
 
 func main() {

@@ -2,8 +2,8 @@ package main
 
 import (
     "fmt"
-    "sevrest"
     //"strconv"
+    "github.com/mcronce/sevrest"
 )
 
 func main() {

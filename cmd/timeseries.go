@@ -2,9 +2,9 @@ package main
     
 import (
     "fmt"
-    "sevrest"
     "time"
     "strconv"
+    "github.com/mcronce/sevrest"
 )
 
 // We can built a custom struct to receive data and type it accordingly
