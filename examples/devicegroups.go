@@ -8,9 +8,9 @@ import (
 
 func main() {
 	// Create Client and Login
-	var c = sevrest.Client("http://bhale-56-10.sevone.com/api/v1/")
+	var c = sevrest.Client("http://localhost:8080/api/v1/")
 	var err = c.Auth("admin", ***REMOVED***)
-	if(err != nil) {
+	if err != nil {
 		fmt.Printf(err.Error())
 	}
 
@@ -19,7 +19,7 @@ func main() {
 	// Get all devicegroups
 	fmt.Printf("attempting devicegroups\n")
 	resp, err := c.Get("devicegroups")
-	if(err != nil) {
+	if err != nil {
 		fmt.Printf("ERROR: %s", err.Error())
 	}
 	fmt.Println("StatusCode: ", resp.StatusCode)
@@ -27,4 +27,3 @@ func main() {
 
 	sevrest.PrettyPrint(respMap)
 }
-
