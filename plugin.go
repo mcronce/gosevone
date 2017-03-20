@@ -17,7 +17,7 @@ type PluginObjectType struct {
 }
 
 // Sane defaults:  include_extended_info = false, filter = nil
-func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map[string]interface{}) ([]PluginObjectType, error) {
+func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map[string]interface{}) (interface{}, error) {
 	// TODO:  Loop through pages
 	page := 0
 	size := 50
@@ -40,6 +40,5 @@ func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map
 		return nil, err
 	}
 
-	PrettyPrint(response_data)
-	return nil, nil
+	return response_data, nil
 }
