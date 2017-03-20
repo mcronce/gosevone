@@ -34,11 +34,24 @@ func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map
 		return nil, err
 	}
 
-	var response_data map[string]interface{}
+	// TODO:  There's gotta be a better way to do this than to decode the
+	//    JSON, only to grab a subscript only to re-marshal it then unmarshal
+	//    it again into the resulting array
+	var response_data map[string]string
 	err = response.Decode(&response_data)
 	if(err != nil) {
 		return nil, err
 	}
+	content, err := json.Marshal(response_data["content"])
+	if(err != nil) {
+		return nil, err
+	}
 
-	return response_data, nil
+	var array []PluginObjectType
+	err = json.Unmarshal(content, &array)
+	if(err != nil) {
+		return nil, err)
+	}
+
+	return array, nil
 }
