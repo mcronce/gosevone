@@ -3,7 +3,7 @@ package sevrest
 import (
 	"fmt"
 
-	"github.com/mcronce/gorest"
+	"github.com/sevone/gorest"
 )
 
 type PluginObjectType struct {
@@ -43,4 +43,3 @@ func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map
 	PrettyPrint(response_data)
 	return nil, nil
 }
-
