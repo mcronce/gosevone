@@ -1,6 +1,7 @@
 package sevrest
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/mcronce/gorest"
@@ -50,7 +51,7 @@ func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map
 	var array []PluginObjectType
 	err = json.Unmarshal(content, &array)
 	if(err != nil) {
-		return nil, err)
+		return nil, err
 	}
 
 	return array, nil
