@@ -1,5 +1,3 @@
-Copy this sevrest directory to you GO home /src directory
+This "sevrest" library provides a swathe of sensible, usable Go functions around the SevOne REST API.
 
-To run the examples, from the examples directory run go run <example.go>
-
-
+Simply import "github.com/sevone/sevrest" and you're set.
