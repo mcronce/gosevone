@@ -1,31 +1,30 @@
 package main
 
 import (
-    "fmt"
-    //"strconv"
-    "github.com/mcronce/sevrest"
+	"fmt"
+	//"strconv"
+	"github.com/mcronce/sevrest"
 )
 
 func main() {
+	// Create Client and Login
+	var c = sevrest.Client("http://bhale-56-10.sevone.com/api/v1/")
+	var err = c.Auth("admin", ***REMOVED***)
+	if(err != nil) {
+		fmt.Printf(err.Error())
+	}
 
-    // Create Client and Login
-    var c = sevrest.Client("http://bhale-56-10.sevone.com/api/v1/")
-    var err = c.Auth("admin", ***REMOVED***)
-    if(err != nil) {
-        fmt.Printf(err.Error())
-    }
+	var respMap []map[string]interface{}
 
-    var respMap []map[string]interface{}
+	// Get all devicegroups
+	fmt.Printf("attempting devicegroups\n")
+	resp, err := c.Get("devicegroups")
+	if(err != nil) {
+		fmt.Printf("ERROR: %s", err.Error())
+	}
+	fmt.Println("StatusCode: ", resp.StatusCode)
+	err = resp.Decode(&respMap)
 
-    // Get all devicegroups
-    fmt.Printf("attempting devicegroups\n")
-    resp, err := c.Get("devicegroups")
-    if(err != nil) {
-        fmt.Printf("ERROR: %s", err.Error())
-    }
-    fmt.Println("StatusCode: ", resp.StatusCode)
-    err = resp.Decode(&respMap)
-
-    sevrest.PrettyPrint(respMap)
-
+	sevrest.PrettyPrint(respMap)
 }
+
