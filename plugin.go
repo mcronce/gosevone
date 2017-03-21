@@ -68,7 +68,7 @@ func (this *SevRest) GetIndicatorTypes(include_extended_info bool, filter map[st
 }
 
 // Sane defaults:  include_extended_info = false, filter = nil
-func (this *SevRest) GetObjectTypes(include_extended_info bool, filter map[string]interface{}) (interface{}, error) {
+func (this *SevRest) GetObjectTypes(include_extended_info bool, filter map[string]interface{}) ([]ObjectType, error) {
 	// TODO:  Loop through pages
 	page := 0
 	size := 50
