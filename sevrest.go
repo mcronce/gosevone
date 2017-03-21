@@ -20,6 +20,14 @@ type SevRest struct {
 	Rest *gorest.Client
 }
 
+type SearchResponse struct {
+	PageNumber uint `json:"pageNumber"`
+	PageSize uint `json:"pageSize"`
+	TotalElements uint `json:"totalElements"`
+	TotalPages uint `json:"totalPages"`
+	Content json.RawMessage `json:"content"`
+}
+
 // Build the initial client
 func New(base_url string) *SevRest {
 	return &SevRest{

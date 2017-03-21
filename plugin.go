@@ -1,6 +1,7 @@
 package sevrest
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/sevone/gorest"
@@ -14,16 +15,6 @@ type PluginObjectType struct {
 	IsEnabled bool `json:"isEnabled"`
 	IsEditable bool `json:"isEditable"`
 	ExtendedInfo map[string]interface{} `json:"extendedInfo"`
-}
-
-// TODO:  Do something better than have a separate type for every kind of
-//    response.
-type GetPluginObjectTypeResponse struct {
-	PageNumber uint `json:"pageNumber"`
-	PageSize uint `json:"pageSize"`
-	TotalElements uint `json:"totalElements"`
-	TotalPages uint `json:"totalPages"`
-	Content []PluginObjectType `json:"content"`
 }
 
 // Sane defaults:  include_extended_info = false, filter = nil
@@ -44,12 +35,18 @@ func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map
 		return nil, err
 	}
 
-	var response_data GetPluginObjectTypeResponse
+	var response_data SearchResponse
 	err = response.Decode(&response_data)
 	if(err != nil) {
 		return nil, err
 	}
 
-	return response_data.Content, nil
+	var array []PluginObjectType
+	err = json.Unmarshal(response_data.Content, &array)
+	if(err != nil) {
+		return nil, err
+	}
+
+	return array, nil
 }
 
