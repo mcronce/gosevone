@@ -13,8 +13,12 @@ func main() {
 		fmt.Printf(err.Error())
 	}
 
-	// TODO:  Create type
+	// TODO:  Create object type
 	response, err := c.GetPluginObjectTypes(false, nil)
+	sevrest.PrettyPrint(response)
+
+	// TODO:  Create indicator type
+	response, err = c.GetPluginIndicatorTypes(false, nil)
 	sevrest.PrettyPrint(response)
 }
 
