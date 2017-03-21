@@ -1,7 +1,6 @@
 package sevrest
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/sevone/gorest"
@@ -15,6 +14,16 @@ type PluginObjectType struct {
 	IsEnabled bool `json:"isEnabled"`
 	IsEditable bool `json:"isEditable"`
 	ExtendedInfo map[string]interface{} `json:"extendedInfo"`
+}
+
+// TODO:  Do something better than have a separate type for every kind of
+//    response.
+type GetPluginObjectTypeResponse struct {
+	PageNumber uint `json:"pageNumber"`
+	PageSize uint `json:"pageSize"`
+	TotalElements uint `json:"totalElements"`
+	TotalPages uint `json:"totalPages"`
+	Content []PluginObjectType `json:"content"`
 }
 
 // Sane defaults:  include_extended_info = false, filter = nil
@@ -35,25 +44,12 @@ func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map
 		return nil, err
 	}
 
-	// TODO:  There's gotta be a better way to do this than to decode the
-	//    JSON, only to grab a subscript only to re-marshal it then unmarshal
-	//    it again into the resulting array
-	var response_data map[string]interface{}
+	var response_data GetPluginObjectTypeResponse
 	err = response.Decode(&response_data)
 	if(err != nil) {
 		return nil, err
 	}
 
-	content, err := json.Marshal(response_data["content"])
-	if(err != nil) {
-		return nil, err
-	}
-
-	var array []PluginObjectType
-	err = json.Unmarshal(content, &array)
-	if(err != nil) {
-		return nil, err
-	}
-
-	return array, nil
+	return response_data.Content, nil
 }
+
