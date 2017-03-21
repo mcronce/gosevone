@@ -3,12 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/sevone/sevrest"
-	"strconv"
 )
 
 func main() {
 	// Create Client and Login
-	var c = sevrest.Client("http://localhost:8080/api/v1")
+	var c = sevrest.New("http://localhost:8080/api/v1")
 	var err = c.Auth("admin", "yourpassword")
 	if err != nil {
 		fmt.Printf(err.Error())
@@ -29,7 +28,7 @@ func main() {
 	var respDevice CreateDeviceResponse
 
 	// Create the device
-	resp, err := c.Post("devices", device)
+	resp, err := c.Rest.Post("devices", device)
 	if err != nil {
 		fmt.Printf("ERROR: %s", err.Error())
 	}
@@ -37,24 +36,19 @@ func main() {
 	err = resp.Decode(&respDevice)
 	sevrest.PrettyPrint(respDevice) // We will only see the id Field
 
-	// Otherwise we'll just a map for our response
-	var respMap map[string]interface{}
-
 	// Get our newly created device
-	resp, err = c.Get("devices/" + strconv.Itoa(respDevice.DeviceId))
+	devices, err := c.GetDevices(map[string]interface{}{"ids" : []int{respDevice.DeviceId}})
 	if err != nil {
 		fmt.Printf("ERROR: %s", err.Error())
 	}
-	fmt.Println("StatusCode: ", resp.StatusCode)
-	err = resp.Decode(&respMap)
-	sevrest.PrettyPrint(respMap)
+	sevrest.PrettyPrint(devices)
+	fmt.Println("---")
 
 	// Get all devices
-	resp, err = c.Get("/devices")
+	devices, err = c.GetDevices(nil)
 	if err != nil {
 		fmt.Printf("ERROR: %s", err.Error())
 	}
-	fmt.Println("StatusCode: ", resp.StatusCode)
-	err = resp.Decode(&respMap)
-	sevrest.PrettyPrint(respMap)
+	sevrest.PrettyPrint(devices)
 }
+
