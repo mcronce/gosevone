@@ -14,11 +14,11 @@ func main() {
 	}
 
 	// TODO:  Create object type
-	response, err := c.GetObjectTypes(false, nil)
-	sevrest.PrettyPrint(response)
+	object_types, err := c.GetObjectTypes(false, nil)
+	sevrest.PrettyPrint(object_types)
 
 	// TODO:  Create indicator type
-	response, err = c.GetIndicatorTypes(false, nil)
-	sevrest.PrettyPrint(response)
+	indicator_types, err := c.GetIndicatorTypes(false, nil)
+	sevrest.PrettyPrint(indicator_types)
 }
 
