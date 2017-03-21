@@ -14,7 +14,7 @@ type ObjectType struct {
 	Name string `json:"name"`
 	IsEnabled bool `json:"isEnabled"`
 	IsEditable bool `json:"isEditable"`
-	ExtendedInfo map[string]interface{} `json:"extendedInfo,omitempty"`
+	ExtendedInfo json.RawMessage `json:"extendedInfo,omitempty"`
 }
 
 type IndicatorType struct {
@@ -33,6 +33,7 @@ type IndicatorType struct {
 	AllowMaxValue bool `json:"allowMaximumValue"`
 	SyntheticExpression string `json:"syntheticExpression"`
 	SyntheticMaximumExpression string `json:"syntheticMaximumExpression"`
+	ExtendedInfo json.RawMessage `json:"extendedInfo.omitempty"`
 }
 
 func (this *SevRest) GetIndicatorTypes(include_extended_info bool, filter map[string]interface{}) ([]IndicatorType, error) {
