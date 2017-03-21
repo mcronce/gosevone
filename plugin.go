@@ -7,7 +7,7 @@ import (
 	"github.com/sevone/gorest"
 )
 
-type PluginObjectType struct {
+type ObjectType struct {
 	ID uint `json:"id,omitempty"`
 	PluginID uint `json:"pluginId"`
 	ParentObjectTypeId uint `json:"parentObjectTypeId"`
@@ -17,10 +17,10 @@ type PluginObjectType struct {
 	ExtendedInfo map[string]interface{} `json:"extendedInfo,omitempty"`
 }
 
-type PluginIndicatorType struct {
+type IndicatorType struct {
 	ID uint `json:"id,omitempty"`
 	PluginID uint `json:"pluginId"`
-	PluginObjectTypeID uint `json:"pluginObjectTypeId"`
+	ObjectTypeID uint `json:"pluginObjectTypeId"`
 	Name string `json:"name"`
 	IsEnabled bool `json:"isEnabled"`
 	IsDefault bool `json:"isDefault"`
@@ -35,7 +35,7 @@ type PluginIndicatorType struct {
 	SyntheticMaximumExpression string `json:"syntheticMaximumExpression"`
 }
 
-func (this *SevRest) GetPluginIndicatorTypes(include_extended_info bool, filter map[string]interface{}) ([]PluginIndicatorType, error) {
+func (this *SevRest) GetIndicatorTypes(include_extended_info bool, filter map[string]interface{}) ([]IndicatorType, error) {
 	// TODO:  Loop through pages
 	page := 0
 	size := 50
@@ -58,7 +58,7 @@ func (this *SevRest) GetPluginIndicatorTypes(include_extended_info bool, filter 
 		return nil, err
 	}
 
-	var array []PluginIndicatorType
+	var array []IndicatorType
 	err = json.Unmarshal(response_data.Content, &array)
 	if(err != nil) {
 		return nil, err
@@ -68,7 +68,7 @@ func (this *SevRest) GetPluginIndicatorTypes(include_extended_info bool, filter 
 }
 
 // Sane defaults:  include_extended_info = false, filter = nil
-func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map[string]interface{}) (interface{}, error) {
+func (this *SevRest) GetObjectTypes(include_extended_info bool, filter map[string]interface{}) (interface{}, error) {
 	// TODO:  Loop through pages
 	page := 0
 	size := 50
@@ -91,7 +91,7 @@ func (this *SevRest) GetPluginObjectTypes(include_extended_info bool, filter map
 		return nil, err
 	}
 
-	var array []PluginObjectType
+	var array []ObjectType
 	err = json.Unmarshal(response_data.Content, &array)
 	if(err != nil) {
 		return nil, err
