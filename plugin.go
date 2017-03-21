@@ -14,7 +14,7 @@ type PluginObjectType struct {
 	Name string `json:"name"`
 	IsEnabled bool `json:"isEnabled"`
 	IsEditable bool `json:"isEditable"`
-	ExtendedInfo map[string]interface{} `json:"extendedInfo"`
+	ExtendedInfo map[string]interface{} `json:"extendedInfo,omitempty"`
 }
 
 // Sane defaults:  include_extended_info = false, filter = nil
