@@ -114,7 +114,7 @@ func (this *SevRest) GetDeviceObjects(include_indicators bool, include_extended_
 	if(err != nil) {
 		return nil, err
 	}
-	
+
 	return response_data, nil
 }
 
