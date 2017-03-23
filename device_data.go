@@ -58,7 +58,7 @@ func (this *SevRest) PostDeviceData(device *DeviceData) error {
 
 // TODO:  More args?
 func NewDeviceData(name string, initial_timestamp uint, source_id uint) DeviceData {
-	return DeviceData{
+	device := DeviceData{
 		Name : name,
 		Type : "Generic",
 		OldestTimestamp : initial_timestamp,
@@ -68,10 +68,14 @@ func NewDeviceData(name string, initial_timestamp uint, source_id uint) DeviceDa
 		Objects : make([]DeviceDataObject, 0),
 		ObjectMap : make(map[string]uint),
 	}
+	if(source_id == 0) {
+		device.CreateAutomatically = true
+	}
+	return device
 }
 
 // TODO:  More args?
-func (this *DeviceData) NewObject(name string, type_name string) (uint, *DeviceDataObject) {
+func (this *DeviceData) NewObject(name string, type_name string, create_automatically bool) (uint, *DeviceDataObject) {
 	object := DeviceDataObject{
 		Name : name,
 		Type : type_name,
@@ -93,7 +97,7 @@ func (this *DeviceData) AddIndicator(object_name string, object_type string, tim
 	if(exists) {
 		object = &this.Objects[id]
 	} else {
-		_, object = this.NewObject(object_name, object_type)
+		_, object = this.NewObject(object_name, object_type, this.CreateAutomatically)
 	}
 
 	object.AddIndicator(time, indicator_name, value)
