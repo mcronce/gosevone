@@ -22,7 +22,7 @@ type DeviceDataObject struct {
 	Type string `json:"type"`
 	PluginID uint `json:"pluginId,omitempty"`
 	PluginName string `json:"pluginName,omitempty"`
-	Description string `json:"description.omitempty"`
+	Description string `json:"description,omitempty"`
 	CreateAutomatically bool `json:"automaticCreation,omitempty"`
 	Timestamps []DeviceDataTimestamp `json:"timestamps"`
 	// Map of times to indices
