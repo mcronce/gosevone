@@ -57,7 +57,7 @@ func NewDeviceData(name string, initial_timestamp uint, source_id uint) DeviceDa
 }
 
 // TODO:  More args?
-func (this *DeviceData) NewObject(name string, type_name string) *DeviceDataObject {
+func (this *DeviceData) NewObject(name string, type_name string) (uint, *DeviceDataObject) {
 	object := DeviceDataObject{
 		Name : name,
 		Type : type_name,
@@ -65,32 +65,35 @@ func (this *DeviceData) NewObject(name string, type_name string) *DeviceDataObje
 		PluginName : "BULKDATA",
 		Timestamps : make([]DeviceDataTimestamp, 0),
 	}
-	this.ObjectMap[name] = len(this.Objects)
+	id := len(this.Objects)
+	this.ObjectMap[name] = id
 	this.Objects = append(this.Objects, object)
-	return &object
+	return id, &object
 }
 
 // TODO:  More args?
-func (this *DeviceDataObject) NewTimestamp(time uint) *DeviceDataTimestamp {
+func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestamp) {
 	timestamp := DeviceDataTimestamp{
 		Time : time,
 		Indicators : make([]DeviceDataIndicator, 0),
 		IndicatorMap : make(map[string]int),
 	}
-	this.TimestampMap(time) = len(this.Timestamps)
+	id := len(this.Timestamps)
+	this.TimestampMap(time) = id
 	this.Timestamps = append(this.Timestamps, timestamp)
-	return &timestamp
+	return id, &timestamp
 }
 
 // TODO:  More args?
-func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) *DeviceDataIndicator {
+func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) (uint, *DeviceDataIndicator) {
 	indicator := DeviceDataIndicator{
 		Name : name,
 		Value : value,
 		Format : "GAUGE",
 	}
-	this.IndicatorMap[name] = len(this.Indicators)
+	id := len(this.Indicators)
+	this.IndicatorMap[name] = id
 	this.Indicators = append(this.Indicators, indicator)
-	return &indicator
+	return id, &indicator
 }
 
