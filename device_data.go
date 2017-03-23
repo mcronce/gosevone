@@ -14,7 +14,7 @@ type DeviceData struct {
 	SourceID uint `json:"sourceId,omitempty"`
 	Objects []DeviceDataObject `json:"objects"`
 	// Map of object names to indices
-	ObjectMap map[string]uint
+	ObjectMap map[string]uint `json:"-"`
 }
 
 type DeviceDataObject struct {
@@ -26,14 +26,14 @@ type DeviceDataObject struct {
 	CreateAutomatically bool `json:"automaticCreation,omitempty"`
 	Timestamps []DeviceDataTimestamp `json:"timestamps"`
 	// Map of times to indices
-	TimestampMap map[uint]uint
+	TimestampMap map[uint]uint `json:"-"`
 }
 
 type DeviceDataTimestamp struct {
 	Time uint `json:"timestamp"`
 	Indicators []DeviceDataIndicator `json:"indicators"`
 	// Map of indicator names to indices
-	IndicatorMap map[string]uint
+	IndicatorMap map[string]uint `json:"-"`
 }
 
 type DeviceDataIndicator struct {
