@@ -124,13 +124,12 @@ func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) (uint,
 }
 
 func (this *DeviceDataTimestamp) AddIndicator(name string, value float64) {
-	var indicator *DeviceDataIndicator
-
 	id, exists := this.IndicatorMap[name]
 	if(exists) {
-		indicator = &this.Indicators[id]
+		indicator := &this.Indicators[id]
+		indicator.Value = value
 	} else {
-		_, indicator = this.NewIndicator(name, value)
+		this.NewIndicator(name, value)
 	}
 }
 
