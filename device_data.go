@@ -94,7 +94,7 @@ func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestam
 		IndicatorMap : make(map[string]int),
 	}
 	id := len(this.Timestamps)
-	this.TimestampMap(time) = id
+	this.TimestampMap[time] = id
 	this.Timestamps = append(this.Timestamps, timestamp)
 	return id, &timestamp
 }
