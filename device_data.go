@@ -81,6 +81,7 @@ func (this *DeviceData) NewObject(name string, type_name string, create_automati
 		Type : type_name,
 		PluginID : 17,
 		PluginName : "BULKDATA",
+		CreateAutomatically : create_automatically,
 		Timestamps : make([]DeviceDataTimestamp, 0),
 		TimestampMap : make(map[uint]uint),
 	}
