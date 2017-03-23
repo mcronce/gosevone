@@ -11,7 +11,7 @@ type DeviceData struct {
 	LatestTimestamp uint `json:"newTs"`
 	IP string `json:"ip"`
 	CreateAutomatically bool `json:"automaticCreation,omitempty"`
-	SourceID uint `json:"sourceId"`
+	SourceID uint `json:"sourceId,omitempty"`
 	Objects []DeviceDataObject `json:"objects"`
 	// Map of object names to indices
 	ObjectMap map[string]uint
