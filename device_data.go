@@ -1,12 +1,5 @@
 package sevrest
 
-import (
-	"encoding/json"
-	"fmt"
-
-	"github.com/sevone/gorest"
-)
-
 type DeviceData struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
@@ -23,7 +16,7 @@ type DeviceData struct {
 type DeviceDataObject struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
-	PluginId uint `json:"pluginId,omitempty"`
+	PluginID uint `json:"pluginId,omitempty"`
 	PluginName string `json:"pluginName,omitempty"`
 	Description string `json:"description.omitempty"`
 	CreateAutomatically bool `json:"automaticCreation,omitempty"`
@@ -45,5 +38,56 @@ type DeviceDataIndicator struct {
 	Format string `json:"format"`
 	Units string `json:"units,omitempty"`
 	MaxValue float64 `json:"maxValue,omitempty"`
+}
+
+// TODO:  More args?
+func NewDeviceData(name string, initial_timestamp uint, source_id uint) DeviceData {
+	return DeviceData{
+		Name : name,
+		Type : "Generic",
+		OldestTimestamp : initial_timestamp,
+		LatestTimestamp : initial_timestamp,
+		SourceID : source_id,
+		IP : "0.0.0.0",
+		Objects : make([]DeviceDataObject, 0),
+		ObjectMap : make(map[string]int),
+	}
+}
+
+// TODO:  More args?
+func (this *DeviceData) NewObject(name string, type_name string) *DeviceDataObject {
+	object := DeviceDataObject{
+		Name : name,
+		Type : type_name,
+		PluginID : 17,
+		PluginName : "BULKDATA",
+		Timestamps : make([]DeviceDataTimestamp, 0),
+	}
+	this.ObjectMap[name] = len(this.Objects)
+	this.Objects = append(this.Objects, object)
+	return &object
+}
+
+// TODO:  More args?
+func (this *DeviceDataObject) NewTimestamp(time uint) *DeviceDataTimestamp {
+	timestamp := DeviceDataTimestamp{
+		Time : time,
+		Indicators : make([]DeviceDataIndicator, 0),
+		IndicatorMap : make(map[string]int),
+	}
+	this.Timestamps = append(this.Timestamps, timestamp)
+	return &timestamp
+}
+
+// TODO:  More args?
+func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) *DeviceDataIndicator {
+	indicator := DeviceDataIndicator{
+		Name : name,
+		Value : value,
+		Format : "GAUGE",
+	}
+	this.IndicatorMap[name] = len(this.Indicators)
+	this.Indicators = append(this.Indicators, indicator)
+	return &indicator
 }
 
