@@ -1,5 +1,9 @@
 package sevrest
 
+import (
+	"encoding/json"
+)
+
 type DeviceData struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
@@ -40,6 +44,16 @@ type DeviceDataIndicator struct {
 	Format string `json:"format"`
 	Units string `json:"units,omitempty"`
 	MaxValue float64 `json:"maxValue,omitempty"`
+}
+
+func (this *SevRest) PostDeviceData(device *DeviceData) error {
+	data, err := json.Marshal(this)
+	if(err != nil) {
+		return err
+	}
+
+	_, err = this.Rest.Post("devices/data", data)
+	return err
 }
 
 // TODO:  More args?
