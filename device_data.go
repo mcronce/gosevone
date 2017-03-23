@@ -71,6 +71,21 @@ func (this *DeviceData) NewObject(name string, type_name string) (uint, *DeviceD
 	return id, &object
 }
 
+func (this *DeviceData) AddIndicator(object_name string, object_type string, time uint, indicator_name string, value float64) {
+	var object *DeviceDataObject
+	var object_id uint
+
+	id, exists := this.ObjectMap[object_name]
+	if(exists) {
+		object = &this.Objects[id]
+		object_id = id
+	} else {
+		object_id, object = this.NewObject(object_name, object_type)
+	}
+
+	object.AddIndicator(time, indicator_name, value)
+}
+
 // TODO:  More args?
 func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestamp) {
 	timestamp := DeviceDataTimestamp{
@@ -84,6 +99,21 @@ func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestam
 	return id, &timestamp
 }
 
+func (this *DeviceDataObject) AddIndicator(time uint, name string, value float64) {
+	var timestamp *DeviceDataTimestamp
+	var timestamp_id uint
+
+	id, exists := this.TimestampMap[time]
+	if(exists) {
+		timestamp = &this.Timestamps[id]
+		timestamp_id = id
+	} else {
+		timestamp_id, timestamp = this.NewTimestamp(time)
+	}
+
+	timestamp.AddIndicator(name, value)
+}
+
 // TODO:  More args?
 func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) (uint, *DeviceDataIndicator) {
 	indicator := DeviceDataIndicator{
@@ -95,5 +125,18 @@ func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) (uint,
 	this.IndicatorMap[name] = id
 	this.Indicators = append(this.Indicators, indicator)
 	return id, &indicator
+}
+
+func (this *DeviceDataTimestamp) AddIndicator(name string, value float64) {
+	var indicator *DeviceDataIndicator
+	var indicator_id uint
+
+	id, exists := this.IndicatorMap[name]
+	if(exists) {
+		indicator = &this.Indicators[id]
+		indicator_id = id
+	} else {
+		indicator_id, indicator = this.NewIndicator(name, value)
+	}
 }
 
