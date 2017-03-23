@@ -84,6 +84,19 @@ func (this *DeviceData) AddIndicator(object_name string, object_type string, tim
 	object.AddIndicator(time, indicator_name, value)
 }
 
+func (this *DeviceData) ResolveTimestamps() {
+	for _, o := range this.Objects {
+		for _, t := range o.Timestamps {
+			if(t.Time < this.OldestTimestamp) {
+				this.OldestTimestamp = t.Time
+			}
+			if(t.Time > this.NewestTimestamp) {
+				this.NewestTimestamp = t.Time
+			}
+		}
+	}
+}
+
 // TODO:  More args?
 func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestamp) {
 	timestamp := DeviceDataTimestamp{
