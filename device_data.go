@@ -21,6 +21,8 @@ type DeviceDataObject struct {
 	Description string `json:"description.omitempty"`
 	CreateAutomatically bool `json:"automaticCreation,omitempty"`
 	Timestamps []DeviceDataTimestamp `json:"timestamps"`
+	// Map of times to indices
+	TimestampMap map[uint]int
 }
 
 type DeviceDataTimestamp struct {
@@ -75,6 +77,7 @@ func (this *DeviceDataObject) NewTimestamp(time uint) *DeviceDataTimestamp {
 		Indicators : make([]DeviceDataIndicator, 0),
 		IndicatorMap : make(map[string]int),
 	}
+	this.TimestampMap(time) = len(this.Timestamps)
 	this.Timestamps = append(this.Timestamps, timestamp)
 	return &timestamp
 }
