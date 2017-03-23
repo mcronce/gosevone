@@ -104,8 +104,8 @@ func (this *DeviceData) ResolveTimestamps() {
 			if(t.Time < this.OldestTimestamp) {
 				this.OldestTimestamp = t.Time
 			}
-			if(t.Time > this.NewestTimestamp) {
-				this.NewestTimestamp = t.Time
+			if(t.Time > this.LatestTimestamp) {
+				this.LatestTimestamp = t.Time
 			}
 		}
 	}
