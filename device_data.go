@@ -10,7 +10,7 @@ type DeviceData struct {
 	SourceID uint `json:"sourceId"`
 	Objects []DeviceDataObject `json:"objects"`
 	// Map of object names to indices
-	ObjectMap map[string]int
+	ObjectMap map[string]uint
 }
 
 type DeviceDataObject struct {
@@ -22,14 +22,14 @@ type DeviceDataObject struct {
 	CreateAutomatically bool `json:"automaticCreation,omitempty"`
 	Timestamps []DeviceDataTimestamp `json:"timestamps"`
 	// Map of times to indices
-	TimestampMap map[uint]int
+	TimestampMap map[uint]uint
 }
 
 type DeviceDataTimestamp struct {
 	Time uint `json:"timestamp"`
 	Indicators []DeviceDataIndicator `json:"indicators"`
 	// Map of indicator names to indices
-	IndicatorMap map[string]int
+	IndicatorMap map[string]uint
 }
 
 type DeviceDataIndicator struct {
@@ -52,7 +52,7 @@ func NewDeviceData(name string, initial_timestamp uint, source_id uint) DeviceDa
 		SourceID : source_id,
 		IP : "0.0.0.0",
 		Objects : make([]DeviceDataObject, 0),
-		ObjectMap : make(map[string]int),
+		ObjectMap : make(map[string]uint),
 	}
 }
 
@@ -65,7 +65,7 @@ func (this *DeviceData) NewObject(name string, type_name string) (uint, *DeviceD
 		PluginName : "BULKDATA",
 		Timestamps : make([]DeviceDataTimestamp, 0),
 	}
-	id := len(this.Objects)
+	id := uint(len(this.Objects))
 	this.ObjectMap[name] = id
 	this.Objects = append(this.Objects, object)
 	return id, &object
@@ -91,9 +91,9 @@ func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestam
 	timestamp := DeviceDataTimestamp{
 		Time : time,
 		Indicators : make([]DeviceDataIndicator, 0),
-		IndicatorMap : make(map[string]int),
+		IndicatorMap : make(map[string]uint),
 	}
-	id := len(this.Timestamps)
+	id := uint(len(this.Timestamps))
 	this.TimestampMap[time] = id
 	this.Timestamps = append(this.Timestamps, timestamp)
 	return id, &timestamp
@@ -121,7 +121,7 @@ func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) (uint,
 		Value : value,
 		Format : "GAUGE",
 	}
-	id := len(this.Indicators)
+	id := uint(len(this.Indicators))
 	this.IndicatorMap[name] = id
 	this.Indicators = append(this.Indicators, indicator)
 	return id, &indicator
