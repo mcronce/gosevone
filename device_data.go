@@ -111,6 +111,11 @@ func (this *DeviceData) ResolveTimestamps() {
 	}
 }
 
+func (this *DeviceData) Post(api *SevRest) error {
+	this.ResolveTimestamps()
+	return api.PostDeviceData(this)
+}
+
 // TODO:  More args?
 func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestamp) {
 	timestamp := DeviceDataTimestamp{
