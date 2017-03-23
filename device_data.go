@@ -78,6 +78,7 @@ func (this *DeviceData) NewObject(name string, type_name string) (uint, *DeviceD
 		PluginID : 17,
 		PluginName : "BULKDATA",
 		Timestamps : make([]DeviceDataTimestamp, 0),
+		TimestampMap : make(map[uint]uint),
 	}
 	id := uint(len(this.Objects))
 	this.ObjectMap[name] = id
