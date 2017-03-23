@@ -83,7 +83,7 @@ func (this *DeviceData) NewObject(name string, type_name string) (uint, *DeviceD
 	id := uint(len(this.Objects))
 	this.ObjectMap[name] = id
 	this.Objects = append(this.Objects, object)
-	return id, &object
+	return id, &this.Objects[id]
 }
 
 func (this *DeviceData) AddIndicator(object_name string, object_type string, time uint, indicator_name string, value float64) {
@@ -127,7 +127,7 @@ func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestam
 	id := uint(len(this.Timestamps))
 	this.TimestampMap[time] = id
 	this.Timestamps = append(this.Timestamps, timestamp)
-	return id, &timestamp
+	return id, &this.Timestamps[id]
 }
 
 func (this *DeviceDataObject) AddIndicator(time uint, name string, value float64) {
@@ -153,7 +153,7 @@ func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) (uint,
 	id := uint(len(this.Indicators))
 	this.IndicatorMap[name] = id
 	this.Indicators = append(this.Indicators, indicator)
-	return id, &indicator
+	return id, &this.Indicators[id]
 }
 
 func (this *DeviceDataTimestamp) AddIndicator(name string, value float64) {
