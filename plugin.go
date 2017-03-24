@@ -15,6 +15,7 @@ type ObjectType struct {
 	IsEnabled bool `json:"isEnabled"`
 	IsEditable bool `json:"isEditable"`
 	ExtendedInfo json.RawMessage `json:"extendedInfo,omitempty"`
+	IndicatorTypes []IndicatorType `json:"-"`
 }
 
 type IndicatorType struct {
