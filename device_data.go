@@ -2,6 +2,7 @@ package sevrest
 
 import (
 	"encoding/json"
+	"io/ioutil"
 )
 
 type DeviceData struct {
@@ -46,14 +47,24 @@ type DeviceDataIndicator struct {
 	MaxValue float64 `json:"maxValue,omitempty"`
 }
 
-func (this *SevRest) PostDeviceData(device *DeviceData) error {
+func (this *SevRest) PostDeviceData(device *DeviceData) (*string, error) {
 	data, err := json.Marshal(this)
 	if(err != nil) {
-		return err
+		return nil, err
 	}
 
-	_, err = this.Rest.Post("devices/data", data)
-	return err
+	response, err := this.Rest.Post("devices/data", data)
+	if(err != nil) {
+		return nil, err
+	}
+
+	body_raw, err := ioutil.ReadAll(response.Body)
+	if(err != nil) {
+		return nil, err
+	}
+	body := string(body_raw)
+
+	return &body, nil
 }
 
 // TODO:  More args?
@@ -117,7 +128,7 @@ func (this *DeviceData) ResolveTimestamps() {
 	}
 }
 
-func (this *DeviceData) Post(api *SevRest) error {
+func (this *DeviceData) Post(api *SevRest) (*string, error) {
 	this.ResolveTimestamps()
 	return api.PostDeviceData(this)
 }
