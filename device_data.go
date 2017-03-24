@@ -10,7 +10,7 @@ type DeviceData struct {
 	Type string `json:"type"`
 	OldestTimestamp uint `json:"oldTs"`
 	LatestTimestamp uint `json:"newTs"`
-	IP string `json:"ip"`
+	IP string `json:"ip,omitempty"`
 	CreateAutomatically bool `json:"automaticCreation,omitempty"`
 	SourceID uint `json:"sourceId,omitempty"`
 	Objects []DeviceDataObject `json:"objects"`
@@ -75,7 +75,6 @@ func NewDeviceData(name string, initial_timestamp uint, source_id uint) DeviceDa
 		OldestTimestamp : initial_timestamp,
 		LatestTimestamp : initial_timestamp,
 		SourceID : source_id,
-		IP : "0.0.0.0",
 		Objects : make([]DeviceDataObject, 0),
 		ObjectMap : make(map[string]uint),
 	}
