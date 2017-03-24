@@ -36,7 +36,7 @@ type IndicatorType struct {
 	ExtendedInfo json.RawMessage `json:"extendedInfo.omitempty"`
 }
 
-func (this *SevRest) GetIndicatorTypes(include_extended_info bool, filter map[string]interface{}) ([]IndicatorType, error) {
+func (this *SevRest) GetIndicatorTypes(include_extended_info bool, filter map[string]interface{}) ([]IndicatorType, error) /* {{{ */ {
 	// TODO:  Loop through pages
 	page := 0
 	size := 50
@@ -66,10 +66,10 @@ func (this *SevRest) GetIndicatorTypes(include_extended_info bool, filter map[st
 	}
 
 	return array, nil
-}
+} // }}}
 
 // Sane defaults:  include_extended_info = false, filter = nil
-func (this *SevRest) GetObjectTypes(include_extended_info bool, filter map[string]interface{}) ([]ObjectType, error) {
+func (this *SevRest) GetObjectTypes(include_extended_info bool, filter map[string]interface{}) ([]ObjectType, error) /* {{{ */ {
 	// TODO:  Loop through pages
 	page := 0
 	size := 50
@@ -99,5 +99,5 @@ func (this *SevRest) GetObjectTypes(include_extended_info bool, filter map[strin
 	}
 
 	return array, nil
-}
+} // }}}
 
