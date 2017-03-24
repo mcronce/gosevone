@@ -48,7 +48,7 @@ type DeviceDataIndicator struct {
 }
 
 func (this *SevRest) PostDeviceData(device *DeviceData) (*string, error) {
-	data, err := json.Marshal(this)
+	data, err := json.Marshal(device)
 	if(err != nil) {
 		return nil, err
 	}
