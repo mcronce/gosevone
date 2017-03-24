@@ -157,7 +157,7 @@ func (this *DeviceData) CreateMissingTypes(api *SevRest) error {
 			return err
 		}
 		if(len(existing_types) == 0) {
-			id, indicator_type_ids, err := api.CreateObjectType(object_type)
+			api.CreateObjectType(object_type)
 		} else {
 			// The object type already exists; make sure all the indicator
 			//    types exist as well.
