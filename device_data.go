@@ -1,7 +1,6 @@
 package sevrest
 
 import (
-	"encoding/json"
 	"io/ioutil"
 )
 
@@ -48,12 +47,7 @@ type DeviceDataIndicator struct {
 }
 
 func (this *SevRest) PostDeviceData(device *DeviceData) (*string, error) {
-	data, err := json.Marshal(device)
-	if(err != nil) {
-		return nil, err
-	}
-
-	response, err := this.Rest.Post("devices/data", data)
+	response, err := this.Rest.Post("devices/data", device)
 	if(err != nil) {
 		return nil, err
 	}
