@@ -15,6 +15,7 @@ type DeviceData struct {
 	Objects []DeviceDataObject `json:"objects"`
 	// Map of object names to indices
 	ObjectMap map[string]uint `json:"-"`
+	CreateTypesAutomatically bool `json:"-"`
 }
 
 type DeviceDataObject struct {
@@ -122,8 +123,63 @@ func (this *DeviceData) ResolveTimestamps() {
 	}
 }
 
+func (this *DeviceData) CreateMissingTypes(api *SevRest) error {
+	type_tree := make(map[string]*ObjectType)
+	for _, object := range this.Objects {
+		object_type, exists := type_tree[object.Type]
+		if(!exists) {
+			object_type = &ObjectType{
+				PluginID : object.PluginID,
+				// TODO:  ParentObjectTypeID?
+				Name : object.Type,
+				IsEnabled : true,
+				IsEditable : false,
+				// TODO:  ExtendedInfo?
+				IndicatorTypes : make([]IndicatorType, 0),
+				IndicatorTypeMap : make(map[string]uint),
+			}
+			type_tree[object.Type] = object_type
+		}
+		for _, timestamp := range object.Timestamps {
+			for _, indicator := range timestamp.Indicators {
+				object_type.AddIndicatorType(indicator.Name, true, true, indicator.Format, indicator.Units, indicator.Units, "", true)
+			}
+		}
+	}
+
+	for name, object_type := range type_tree {
+		filter := map[string]interface{}{
+			"name" : name,
+			"pluginId" : object_type.PluginID,
+		}
+		existing_types, err := api.GetObjectTypes(false, filter)
+		if(err != nil) {
+			return err
+		}
+		if(len(existing_types) == 0) {
+			id, indicator_type_ids, err := api.CreateObjectType(object_type)
+		} else {
+			// The object type already exists; make sure all the indicator
+			//    types exist as well.
+			existing_object_type := &existing_types[0]
+			for _, indicator_type := range object_type.IndicatorTypes {
+				_, exists := object_type.IndicatorTypeMap[indicator_type.Name]
+				if(!exists) {
+					indicator_type.ObjectTypeID = existing_object_type.ID
+					api.CreateIndicatorType(&indicator_type)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 func (this *DeviceData) Post(api *SevRest) (*string, error) {
 	this.ResolveTimestamps()
+	if(this.CreateTypesAutomatically) {
+		this.CreateMissingTypes(api)
+	}
 	return api.PostDeviceData(this)
 }
 
