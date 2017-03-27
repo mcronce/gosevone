@@ -7,6 +7,14 @@ import (
 	"github.com/sevone/gorest"
 )
 
+type Plugin struct {
+	ID uint `json:"id"`
+	Name string `json:"name"`
+	ShortName string `json:"objectName"`
+	Dir string `json:"dir"`
+	Plottable int `json:"plottable"`
+}
+
 type ObjectType struct {
 	ID uint `json:"id,omitempty"`
 	PluginID uint `json:"pluginId"`
@@ -37,6 +45,40 @@ type IndicatorType struct {
 	SyntheticMaximumExpression string `json:"syntheticMaximumExpression"`
 	ExtendedInfo json.RawMessage `json:"extendedInfo,omitempty"`
 }
+
+func (this *SevRest) GetPlugins(filter map[string]string) ([]Plugin, error) /* {{{ */ {
+	page := 0
+	size := 50
+
+	filter_str := fmt.Sprintf("page=%d&size=%d", page, size)
+	value, exists := filter["objectName"]
+	if(exists) {
+		filter_str += fmt.Sprintf("&objectName=%s", value)
+	}
+	value, exists = filter["name"]
+	if(exists) {
+		filter_str += fmt.Sprintf("&name=%s", value)
+	}
+
+	response, err := this.Rest.Get(fmt.Sprintf("plugins?%s", filter_str))
+	if(err != nil) {
+		return nil, err
+	}
+
+	var response_data SearchResponse
+	err = response.Decode(&response_data)
+	if(err != nil) {
+		return nil, err
+	}
+
+	var array []Plugin
+	err = json.Unmarshal(response_data.Content, &array)
+	if(err != nil) {
+		return nil, err
+	}
+
+	return array, nil
+} // }}}
 
 func (this *SevRest) GetIndicatorTypes(include_extended_info bool, filter map[string]interface{}) ([]IndicatorType, error) /* {{{ */ {
 	// TODO:  Loop through pages
