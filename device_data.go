@@ -1,6 +1,8 @@
 package sevrest
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -81,12 +83,12 @@ func NewDeviceData(name string, initial_timestamp uint, source_id uint) DeviceDa
 }
 
 // TODO:  More args?
-func (this *DeviceData) NewObject(name string, type_name string, create_automatically bool) (uint, *DeviceDataObject) {
+func (this *DeviceData) NewObject(name string, type_name string, plugin_name string, create_automatically bool) (uint, *DeviceDataObject) {
 	object := DeviceDataObject{
 		Name : name,
 		Type : type_name,
-		PluginID : 17,
-		PluginName : "BULKDATA",
+		PluginID : 0,
+		PluginName : plugin_name,
 		CreateAutomatically : create_automatically,
 		Timestamps : make([]DeviceDataTimestamp, 0),
 		TimestampMap : make(map[uint]uint),
@@ -97,14 +99,14 @@ func (this *DeviceData) NewObject(name string, type_name string, create_automati
 	return id, &this.Objects[id]
 }
 
-func (this *DeviceData) AddIndicator(object_name string, object_type string, time uint, indicator_name string, value float64) {
+func (this *DeviceData) AddIndicator(object_name string, object_type string, plugin_name string, time uint, indicator_name string, value float64) {
 	var object *DeviceDataObject
 
 	id, exists := this.ObjectMap[object_name]
 	if(exists) {
 		object = &this.Objects[id]
 	} else {
-		_, object = this.NewObject(object_name, object_type, this.CreateAutomatically)
+		_, object = this.NewObject(object_name, object_type, plugin_name, this.CreateAutomatically)
 	}
 
 	object.AddIndicator(time, indicator_name, value)
@@ -121,6 +123,44 @@ func (this *DeviceData) ResolveTimestamps() {
 			}
 		}
 	}
+}
+
+func (this *DeviceData) ResolvePluginIDs(api *SevRest) error {
+	ids := make(map[string]uint)
+
+	for _, object := range this.Objects {
+		if(object.PluginID == 0) {
+			continue
+		}
+
+		_, exists := ids[object.PluginName]
+		if(!exists) {
+			ids[object.PluginName] = 0
+		}
+	}
+
+	for name, _ := range ids {
+		filter := map[string]string{"objectName" : name}
+		plugins, err := api.GetPlugins(filter)
+		if(err != nil) {
+			return err
+		}
+		if(len(plugins) == 0) {
+			return errors.New(fmt.Sprintf("Plugin \"%s\" not found", name))
+		}
+		ids[name] = plugins[0].ID
+	}
+
+	for i, object := range this.Objects {
+		if(object.PluginID == 0) {
+			continue
+		}
+
+		id, _ := ids[object.PluginName]
+		this.Objects[i].PluginID = id
+	}
+
+	return nil
 }
 
 func (this *DeviceData) CreateMissingTypes(api *SevRest) error {
@@ -178,7 +218,15 @@ func (this *DeviceData) CreateMissingTypes(api *SevRest) error {
 func (this *DeviceData) Post(api *SevRest) (*string, error) {
 	this.ResolveTimestamps()
 	if(this.CreateTypesAutomatically) {
-		this.CreateMissingTypes(api)
+		err := this.ResolvePluginIDs(api)
+		if(err != nil) {
+			return nil, err
+		}
+
+		err = this.CreateMissingTypes(api)
+		if(err != nil) {
+			return nil, err
+		}
 	}
 	return api.PostDeviceData(this)
 }
