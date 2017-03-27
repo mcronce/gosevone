@@ -144,16 +144,58 @@ func (this *SevRest) GetIndicatorTypeExtendedInfo(plugin uint) (json.RawMessage,
 } // }}}
 
 func (this *SevRest) CreateIndicatorType(payload *IndicatorType) (uint, error) /* {{{ */ {
-	ext, err := this.GetIndicatorTypeExtendedInfo(payload.PluginID)
-	if(err != nil) {
-		return 0, err
-	}
-
 	response, err := this.Rest.Post("plugins/indicatortypes", payload)
 	if(err != nil) {
 		return 0, err
 	}
-	payload.ExtendedInfo = ext
+
+	var ext map[string]interface{}
+	switch(payload.PluginID) {
+		case 1:
+			ext = map[string]interface{}{
+				"expression" : "",
+				"oidHigh" : "",
+				"speedUnits" : "",
+				"speedOid" : "",
+			}
+		case 9:
+			ext = map[string]interface{}{
+				"minimumComplianceRevision" : 1,
+				"base" : "",
+			}
+		case 11:
+			ext = map[string]interface{}{
+				"propertyName" : "",
+				"isDiscovered" : false,
+			}
+		case 12:
+			ext = map[string]interface{}{
+				"isDiscovered" : false,
+				"counterName" : "",
+			}
+		case 14:
+			ext = map[string]interface{}{
+				"expression" : "",
+				"attribute" : "",
+				"maxValueExpression" : "",
+			}
+		case 17:
+			ext = map[string]interface{}{
+				"isIgnore" : false,
+				"fieldIdentifiers" : "",
+			}
+		case 23:
+			ext = map[string]interface{}{
+				"key1" : "",
+				"key2" : "",
+				"key3" : "",
+				"dynamicPluginName" : "",
+			}
+	}
+	payload.ExtendedInfo, err = json.Marshal(ext)
+	if(err != nil) {
+		return 0, err
+	}
 
 	var body IndicatorType
 	err = response.Decode(&body)
