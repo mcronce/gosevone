@@ -210,7 +210,7 @@ func (this *SevRest) CreateIndicatorType(payload *IndicatorType) (uint, error) /
 func (this *SevRest) CreateObjectType(payload *ObjectType) (uint, []uint, error) /* {{{ */ {
 	ext, err := this.GetObjectTypeExtendedInfo(payload.PluginID)
 	if(err != nil) {
-		return 0, err
+		return 0, nil, err
 	}
 
 	response, err := this.Rest.Post("plugins/objecttypes", payload)
