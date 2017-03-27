@@ -103,11 +103,53 @@ func (this *SevRest) GetObjectTypes(include_extended_info bool, filter map[strin
 	return array, nil
 } // }}}
 
+func (this *SevRest) GetObjectTypeExtendedInfo(plugin uint) (json.RawMessage, error) /* {{{ */ {
+	response, err := this.Rest.Get(fmt.Sprintf("plugins/objecttypes/schema/%d", plugin))
+	if(err != nil) {
+		return nil, err
+	}
+
+	var response_data map[string]string
+	err = response.Decode(&response_data)
+	if(err != nil) {
+		return nil, err
+	}
+
+	output_map := make(map[string]string)
+	for k, _ := range response_data {
+		output_map[k] = ""
+	}
+
+	return json.Marshal(output_map)
+} // }}}
+
+func (this *SevRest) GetIndicatorTypeExtendedInfo(plugin uint) (json.RawMessage, error) /* {{{ */ {
+	response, err := this.Rest.Get(fmt.Sprintf("plugins/indicatortypes/schema/%d", plugin))
+	if(err != nil) {
+		return nil, err
+	}
+
+	var response_data map[string]string
+	err = response.Decode(&response_data)
+	if(err != nil) {
+		return nil, err
+	}
+
+	output_map := make(map[string]string)
+	for k, _ := range response_data {
+		output_map[k] = ""
+	}
+
+	return json.Marshal(output_map)
+} // }}}
+
 func (this *SevRest) CreateIndicatorType(payload *IndicatorType) (uint, error) /* {{{ */ {
+	ext, err := this.GetIndicatorTypeExtendedInfo(payload.PluginID)
 	response, err := this.Rest.Post("plugins/indicatortypes", payload)
 	if(err != nil) {
 		return 0, err
 	}
+	payload.ExtendedInfo = ext
 
 	var body IndicatorType
 	err = response.Decode(&body)
@@ -120,10 +162,12 @@ func (this *SevRest) CreateIndicatorType(payload *IndicatorType) (uint, error) /
 } // }}}
 
 func (this *SevRest) CreateObjectType(payload *ObjectType) (uint, []uint, error) /* {{{ */ {
+	ext, err := this.GetObjectTypeExtendedInfo(payload.PluginID)
 	response, err := this.Rest.Post("plugins/objecttypes", payload)
 	if(err != nil) {
 		return 0, nil, err
 	}
+	payload.ExtendedInfo = ext
 
 	var body ObjectType
 	err = response.Decode(&body)
