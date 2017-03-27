@@ -129,7 +129,7 @@ func (this *DeviceData) ResolvePluginIDs(api *SevRest) error {
 	ids := make(map[string]uint)
 
 	for _, object := range this.Objects {
-		if(object.PluginID == 0) {
+		if(object.PluginID != 0) {
 			continue
 		}
 
@@ -152,7 +152,7 @@ func (this *DeviceData) ResolvePluginIDs(api *SevRest) error {
 	}
 
 	for i, object := range this.Objects {
-		if(object.PluginID == 0) {
+		if(object.PluginID != 0) {
 			continue
 		}
 
