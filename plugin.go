@@ -145,6 +145,10 @@ func (this *SevRest) GetIndicatorTypeExtendedInfo(plugin uint) (json.RawMessage,
 
 func (this *SevRest) CreateIndicatorType(payload *IndicatorType) (uint, error) /* {{{ */ {
 	ext, err := this.GetIndicatorTypeExtendedInfo(payload.PluginID)
+	if(err != nil) {
+		return 0, err
+	}
+
 	response, err := this.Rest.Post("plugins/indicatortypes", payload)
 	if(err != nil) {
 		return 0, err
@@ -163,6 +167,10 @@ func (this *SevRest) CreateIndicatorType(payload *IndicatorType) (uint, error) /
 
 func (this *SevRest) CreateObjectType(payload *ObjectType) (uint, []uint, error) /* {{{ */ {
 	ext, err := this.GetObjectTypeExtendedInfo(payload.PluginID)
+	if(err != nil) {
+		return 0, err
+	}
+
 	response, err := this.Rest.Post("plugins/objecttypes", payload)
 	if(err != nil) {
 		return 0, nil, err
