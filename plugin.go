@@ -190,12 +190,12 @@ func (this *SevRest) CreateIndicatorType(payload *IndicatorType) (uint, error) /
 	if(err != nil) {
 		return 0, err
 	}
+	payload.ExtendedInfo = ext
 
 	response, err := this.Rest.Post("plugins/indicatortypes", payload)
 	if(err != nil) {
 		return 0, err
 	}
-	payload.ExtendedInfo = ext
 
 	var body IndicatorType
 	err = response.Decode(&body)
@@ -212,12 +212,12 @@ func (this *SevRest) CreateObjectType(payload *ObjectType) (uint, []uint, error)
 	if(err != nil) {
 		return 0, nil, err
 	}
+	payload.ExtendedInfo = ext
 
 	response, err := this.Rest.Post("plugins/objecttypes", payload)
 	if(err != nil) {
 		return 0, nil, err
 	}
-	payload.ExtendedInfo = ext
 
 	var body ObjectType
 	err = response.Decode(&body)
