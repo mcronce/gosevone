@@ -115,7 +115,7 @@ func (this *DeviceData) AddIndicator(object_name string, object_type string, plu
 func (this *DeviceData) ResolveTimestamps() {
 	for _, o := range this.Objects {
 		for _, t := range o.Timestamps {
-			if(t.Time < this.OldestTimestamp) {
+			if(t.Time < this.OldestTimestamp || this.OldestTimestamp == 0) {
 				this.OldestTimestamp = t.Time
 			}
 			if(t.Time > this.LatestTimestamp) {
