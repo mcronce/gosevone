@@ -182,7 +182,7 @@ func (this *DeviceData) CreateMissingTypes(api *SevRest) error {
 		}
 		for _, timestamp := range object.Timestamps {
 			for _, indicator := range timestamp.Indicators {
-				object_type.AddIndicatorType(indicator.Name, true, true, indicator.Format, indicator.Units, indicator.Units, "", true)
+				object_type.AddIndicatorType(indicator.Name, true, true, indicator.Format, indicator.Units, indicator.Units, indicator.Name, true)
 			}
 		}
 	}
