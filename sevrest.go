@@ -59,7 +59,10 @@ func (this *SevRest) Auth(username string, password string) (error) {
 	// Decode and store the auth token to use for future requests
 	var t Token
 	err = resp.Decode(&t)
-	this.Rest.Headers["X-Auth-Token"] = t.Token
+	if(err != nil) {
+		return err
+	}
+	this.SetToken(t.Token)
 
 	return nil
 }
