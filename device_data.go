@@ -99,17 +99,18 @@ func (this *DeviceData) NewObject(name string, type_name string, plugin_name str
 	return id, &this.Objects[id]
 }
 
-func (this *DeviceData) AddIndicator(object_name string, object_type string, plugin_name string, time uint, indicator_name string, value float64) {
+func (this *DeviceData) AddIndicator(object_name string, object_type string, plugin_name string, time uint, indicator_name string, value float64) (uint, uint, uint, *DeviceDataIndicator) {
 	var object *DeviceDataObject
 
 	id, exists := this.ObjectMap[object_name]
 	if(exists) {
 		object = &this.Objects[id]
 	} else {
-		_, object = this.NewObject(object_name, object_type, plugin_name, this.CreateAutomatically)
+		id, object = this.NewObject(object_name, object_type, plugin_name, this.CreateAutomatically)
 	}
 
-	object.AddIndicator(time, indicator_name, value)
+	timestamp_id, indicator_id, indicator := object.AddIndicator(time, indicator_name, value)
+	return id, timestamp_id, indicator_id, indicator
 }
 
 func (this *DeviceData) ResolveTimestamps() {
@@ -244,17 +245,18 @@ func (this *DeviceDataObject) NewTimestamp(time uint) (uint, *DeviceDataTimestam
 	return id, &this.Timestamps[id]
 }
 
-func (this *DeviceDataObject) AddIndicator(time uint, name string, value float64) {
+func (this *DeviceDataObject) AddIndicator(time uint, name string, value float64) (uint, uint, *DeviceDataIndicator) {
 	var timestamp *DeviceDataTimestamp
 
 	id, exists := this.TimestampMap[time]
 	if(exists) {
 		timestamp = &this.Timestamps[id]
 	} else {
-		_, timestamp = this.NewTimestamp(time)
+		id, timestamp = this.NewTimestamp(time)
 	}
 
-	timestamp.AddIndicator(name, value)
+	indicator_id, indicator := timestamp.AddIndicator(name, value)
+	return id, indicator_id, indicator
 }
 
 // TODO:  More args?
@@ -270,13 +272,13 @@ func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) (uint,
 	return id, &this.Indicators[id]
 }
 
-func (this *DeviceDataTimestamp) AddIndicator(name string, value float64) {
+func (this *DeviceDataTimestamp) AddIndicator(name string, value float64) (uint, *DeviceDataIndicator) {
 	id, exists := this.IndicatorMap[name]
 	if(exists) {
 		indicator := &this.Indicators[id]
 		indicator.Value = value
-	} else {
-		this.NewIndicator(name, value)
+		return id, indicator
 	}
+	return this.NewIndicator(name, value)
 }
 
