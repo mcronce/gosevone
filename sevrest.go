@@ -9,7 +9,7 @@ import (
 
 const (
 	libraryVersion      = "0.1"
-	headerUserAgent     = "sevrest/" + libraryVersion
+	headerUserAgent     = "sevrest/go/" + libraryVersion
 	headerAccept        = "application/json"
 	headerContentType   = "application/json;charset=UTF-8"
 )
