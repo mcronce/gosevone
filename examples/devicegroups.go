@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	//"strconv"
-	"github.com/sevone/sevrest"
+	"github.com/sevone/gosevone"
 )
 
 func main() {
