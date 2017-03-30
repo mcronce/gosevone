@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// Create Client and Login
-	var c = sevrest.Client("http://localhost:8080/api/v1/")
+	var c = sevrest.New("http://localhost:8080/api/v1/")
 	var err = c.Auth("admin", "yourpassword")
 	if err != nil {
 		fmt.Printf(err.Error())
@@ -18,7 +18,7 @@ func main() {
 
 	// Get all devicegroups
 	fmt.Printf("attempting devicegroups\n")
-	resp, err := c.Get("devicegroups")
+	resp, err := c.Rest.Get("devicegroups")
 	if err != nil {
 		fmt.Printf("ERROR: %s", err.Error())
 	}

@@ -16,7 +16,7 @@ type TimeSeriesValue struct {
 
 func main() {
 	// Create Client and Login
-	var c = sevrest.Client("http://localhost:8080/api/v1")
+	var c = sevrest.New("http://localhost:8080/api/v1")
 	var err = c.Auth("admin", "yourpassword")
 	if err != nil {
 		fmt.Printf(err.Error())
@@ -37,7 +37,7 @@ func main() {
 	var respSlice []TimeSeriesValue
 
 	// Do the request
-	resp, err := c.Get("/devices/" + deviceId + "/objects/" + objectId + "/indicators/" + indicatorId + "/data?startTime=" + startString + "&endTime=" + endString)
+	resp, err := c.Rest.Get("/devices/" + deviceId + "/objects/" + objectId + "/indicators/" + indicatorId + "/data?startTime=" + startString + "&endTime=" + endString)
 	if err != nil {
 		fmt.Printf("ERROR: %s", err.Error())
 	}

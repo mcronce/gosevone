@@ -7,7 +7,7 @@ import (
 
 func main() {
 	// Create Client and Login
-	var c = sevrest.Client("http://localhost:8080/api/v1")
+	var c = sevrest.New("http://localhost:8080/api/v1")
 	var err = c.Auth("admin", "yourpassword")
 	if err != nil {
 		fmt.Printf(err.Error())
@@ -31,7 +31,7 @@ func main() {
 	// The response will just be a map of string
 	var respMap map[string]interface{}
 
-	resp, err := c.Post("policies/61/alerts", alert)
+	resp, err := c.Rest.Post("policies/61/alerts", alert)
 	if err != nil {
 		fmt.Printf("ERROR: %s", err.Error())
 	}
