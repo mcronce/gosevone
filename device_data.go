@@ -47,6 +47,7 @@ type DeviceDataIndicator struct {
 	Format string `json:"format"`
 	Units string `json:"units,omitempty"`
 	MaxValue float64 `json:"maxValue,omitempty"`
+	Description string `json:"-"`
 }
 
 func (this *SevRest) PostDeviceData(device *DeviceData) (*string, error) {
@@ -183,7 +184,7 @@ func (this *DeviceData) CreateMissingTypes(api *SevRest) error {
 		}
 		for _, timestamp := range object.Timestamps {
 			for _, indicator := range timestamp.Indicators {
-				object_type.AddIndicatorType(indicator.Name, true, true, indicator.Format, indicator.Units, indicator.Units, indicator.Name, true)
+				object_type.AddIndicatorType(indicator.Name, true, true, indicator.Format, indicator.Units, indicator.Units, indicator.Description, true)
 			}
 		}
 	}
@@ -263,6 +264,7 @@ func (this *DeviceDataObject) AddIndicator(time uint, name string, value float64
 func (this *DeviceDataTimestamp) NewIndicator(name string, value float64) (uint, *DeviceDataIndicator) {
 	indicator := DeviceDataIndicator{
 		Name : name,
+		Description : name,
 		Value : value,
 		Format : "GAUGE",
 	}
