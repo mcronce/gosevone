@@ -205,7 +205,7 @@ func (this *DeviceData) CreateMissingTypes(api *SevRest) error {
 			//    types exist as well.
 			existing_object_type := &existing_types[0]
 			for _, indicator_type := range object_type.IndicatorTypes {
-				_, exists := object_type.IndicatorTypeMap[indicator_type.Name]
+				_, exists := existing_object_type.IndicatorTypeMap[indicator_type.Name]
 				if(!exists) {
 					indicator_type.ObjectTypeID = existing_object_type.ID
 					api.CreateIndicatorType(&indicator_type)
